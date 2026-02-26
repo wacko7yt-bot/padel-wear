@@ -4,6 +4,7 @@ import './globals.css'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { CartDrawer } from '@/components/cart/CartDrawer'
+import { CustomCursor } from '@/components/ui/CustomCursor'
 import { Toaster } from 'react-hot-toast'
 
 const inter = Inter({
@@ -36,6 +37,7 @@ export default function RootLayout({
   return (
     <html lang="es" className={inter.variable}>
       <body className="antialiased">
+        <CustomCursor />
         <Navbar />
         <CartDrawer />
         <main style={{ paddingTop: 'var(--navbar-h)' }}>
