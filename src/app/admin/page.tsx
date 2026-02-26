@@ -4,16 +4,17 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import {
     Package, ShoppingCart, TrendingUp, LogOut,
-    Eye, EyeOff, AlertCircle, LayoutDashboard, Ticket
+    Eye, EyeOff, AlertCircle, LayoutDashboard, Ticket, Clock
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { DashboardView } from '@/components/admin/DashboardView'
 import { ProductosView } from '@/components/admin/ProductosView'
 import { PedidosView } from '@/components/admin/PedidosView'
 import { CuponesView } from '@/components/admin/CuponesView'
+import { AbandonedCartsView } from '@/components/admin/AbandonedCartsView'
 import toast from 'react-hot-toast'
 
-type AdminView = 'dashboard' | 'productos' | 'pedidos' | 'cupones'
+type AdminView = 'dashboard' | 'productos' | 'pedidos' | 'cupones' | 'abandoned_carts'
 
 export default function AdminPage() {
     const [view, setView] = useState<AdminView>('dashboard')
@@ -98,6 +99,7 @@ export default function AdminPage() {
         { id: 'productos', label: 'Productos', Icon: Package },
         { id: 'pedidos', label: 'Pedidos', Icon: ShoppingCart },
         { id: 'cupones', label: 'Cupones', Icon: Ticket },
+        { id: 'abandoned_carts', label: 'Carritos', Icon: Clock },
     ]
 
     return (
@@ -135,6 +137,7 @@ export default function AdminPage() {
                 {view === 'productos' && <ProductosView />}
                 {view === 'pedidos' && <PedidosView />}
                 {view === 'cupones' && <CuponesView />}
+                {view === 'abandoned_carts' && <AbandonedCartsView />}
             </main>
         </div>
     )
