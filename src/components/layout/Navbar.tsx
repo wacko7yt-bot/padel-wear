@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ShoppingBag, Menu, X, User, LayoutDashboard, LogIn, LogOut, Heart } from 'lucide-react'
+import { ShoppingBag, Menu, X, User, LayoutDashboard, LogIn, LogOut, Heart, Package } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { useWishlistStore } from '@/store/wishlistStore'
 import { createClient } from '@/lib/supabase/client'
@@ -14,8 +14,8 @@ import toast from 'react-hot-toast'
 type AccountMode = 'loading' | 'admin' | 'client' | 'guest'
 
 const STATIC_LINKS = [
+    { href: '/', label: 'Inicio' },
     { href: '/productos', label: 'Tienda' },
-    { href: '/#nosotros', label: 'Nosotros' },
 ]
 
 export function Navbar() {
@@ -111,7 +111,7 @@ export function Navbar() {
                     </Link>
 
                     {/* Desktop Nav */}
-                    <nav className="hidden md:flex items-center gap-1">
+                    <nav className="hidden md:flex items-center gap-6">
                         {STATIC_LINKS.map((link) => (
                             <Link
                                 key={link.href}
@@ -122,8 +122,6 @@ export function Navbar() {
                                 {link.label}
                             </Link>
                         ))}
-
-                        <div className="w-px h-6 bg-border mx-2" />
 
                         <button
                             onClick={handleAccountClick}
@@ -203,11 +201,20 @@ export function Navbar() {
                                 </Link>
                             ))}
 
+                            <Link
+                                href="/perfil"
+                                onClick={() => setMenuOpen(false)}
+                                className="animate-fade-up p-4 flex items-center gap-3 text-xl font-semibold tracking-widest uppercase text-primary no-underline border-b border-border"
+                                style={{ animationDelay: `${STATIC_LINKS.length * 70}ms` }}
+                            >
+                                <Package size={24} className="text-accent" /> Mis Pedidos
+                            </Link>
+
                             <button
                                 onClick={handleAccountClick}
                                 className="animate-fade-up p-4 flex items-center gap-3 text-xl font-semibold tracking-widest uppercase text-left w-full bg-transparent border-none border-b border-border"
                                 style={{
-                                    animationDelay: `${STATIC_LINKS.length * 70}ms`,
+                                    animationDelay: `${(STATIC_LINKS.length + 1) * 70}ms`,
                                     color: accountConfig.color
                                 }}
                             >

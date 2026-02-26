@@ -79,6 +79,7 @@ export async function POST(request: Request) {
             shipping_address_collection: {
                 allowed_countries: ['ES', 'PT', 'FR', 'DE', 'IT', 'GB'],
             },
+            allow_promotion_codes: true,
             success_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/exito?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/cancelado`,
             // Enable Link for one-click checkout

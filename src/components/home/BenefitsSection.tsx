@@ -10,9 +10,9 @@ const EASE_OUT = [0.22, 1, 0.36, 1] as const
 const BENEFITS = [
     {
         icon: Zap,
-        tag: 'ALTO RENDIMIENTO',
-        title: 'Tejidos Pro',
-        desc: 'Materiales transpirables de secado ultrarrápido, diseñados para resistir los rallies más intensos y mantenerte fresco en pista.',
+        tag: 'ASEQUIBILIDAD',
+        title: 'Estilo Pro',
+        desc: 'Consigue la estética de los mejores jugadores del mundo a una fracción de su precio. Camisetas réplica con diseño fiel al original.',
     },
     {
         icon: Shield,
@@ -116,9 +116,10 @@ export function BenefitsSection() {
                             whileHover={{
                                 borderColor: ACCENT_HOVR,
                                 background: 'var(--accent-subtle)',
-                                y: -6,
-                                boxShadow: '0 0 36px var(--accent-glow)',
-                                transition: { duration: 0.22 },
+                                y: -10,
+                                scale: 1.02,
+                                boxShadow: '0 20px 40px rgba(0,0,0,0.4), 0 0 20px var(--accent-glow)',
+                                transition: { type: 'spring', stiffness: 400, damping: 17 },
                             }}
                             style={{
                                 padding: '32px 28px',
