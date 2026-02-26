@@ -1,0 +1,17 @@
+# netlify.toml - Optimized for Next.js
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[[redirects]]
+  from = "/*"
+  to = "/.next/server/pages/:splat"
+  status = 200
+  force = true
+
+[build.environment]
+  NEXT_USE_NETLIFY_EDGE = "true"

@@ -79,7 +79,7 @@ export async function POST(request: Request) {
                         p_product_id: productId,
                         p_size_col: size_col,
                         p_quantity: item.quantity ?? 1
-                    }).catch(() => { })
+                    })
                 }
             }
         }
