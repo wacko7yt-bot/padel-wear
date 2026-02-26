@@ -5,13 +5,17 @@ import { getStripe } from '@/lib/stripe/server'
 import { createClient } from '@/lib/supabase/server'
 import type { CartItem } from '@/types'
 
+const DEFAULT_URL = 'https://padel-wear.vercel.app'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || DEFAULT_URL
+
 export async function POST(request: Request) {
     try {
         const stripe = getStripe()
         const supabase = await createClient()
         const { data: { user } } = await supabase.auth.getUser()
 
-        const { items }: { items: CartItem[] } = await request.json()
+        const body = await request.json()
+        const items: CartItem[] = body.items
 
         if (!items || items.length === 0) {
             return NextResponse.json({ error: 'El carrito está vacío' }, { status: 400 })
@@ -75,7 +79,7 @@ export async function POST(request: Request) {
             mode: 'payment',
             line_items: lineItems,
             customer: stripeCustomerId,
-            customer_email: stripeCustomerId ? undefined : user?.email,
+            customer_email: stripeCustomerId ? undefined : (user?.email || undefined),
             metadata: {
                 userId: user?.id ?? 'guest',
             },
@@ -83,9 +87,8 @@ export async function POST(request: Request) {
                 allowed_countries: ['ES', 'PT', 'FR', 'DE', 'IT', 'GB'],
             },
             allow_promotion_codes: true,
-            success_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/exito?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/cancelado`,
-            // Enable Link for one-click checkout
+            success_url: `${APP_URL}/checkout/exito?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${APP_URL}/checkout/cancelado`,
             payment_method_options: {
                 card: {
                     setup_future_usage: 'on_session',
