@@ -89,15 +89,8 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   line-height: 1.5;
-  cursor: none;
 }
 
-/* Permitir cursor normal en dispositivos táctiles */
-@media (hover: none) {
-  body {
-    cursor: auto;
-  }
-}
 
 /* ============================================
    SCROLLBAR
