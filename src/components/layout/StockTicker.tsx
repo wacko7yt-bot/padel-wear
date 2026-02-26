@@ -47,7 +47,9 @@ export function StockTicker() {
             .select('*')
             .eq('available', true)
 
-        if (!error && data) {
+        if (error) {
+            console.error('[STOCK TICKER ERROR]', error)
+        } else if (data) {
             processProducts(data as Producto[])
         }
         setLoading(false)

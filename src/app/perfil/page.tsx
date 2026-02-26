@@ -32,19 +32,21 @@ export default function ProfilePage() {
             setUser(session.user)
 
             // Fetch Profile (user_profiles)
-            const { data: prof } = await supabase
+            const { data: prof, error: pErr } = await supabase
                 .from('user_profiles')
                 .select('*')
                 .eq('id', session.user.id)
                 .single()
+            if (pErr) console.warn('[PROFILE] Perfil no encontrado o error:', pErr)
             setProfile(prof)
 
             // Fetch Orders (pedidos + productos)
-            const { data: ords } = await supabase
+            const { data: ords, error: oErr } = await supabase
                 .from('pedidos')
                 .select('*, productos(*)')
                 .eq('user_id', session.user.id)
                 .order('created_at', { ascending: false })
+            if (oErr) console.error('[PROFILE] Error cargando pedidos:', oErr)
             setOrders(ords || [])
 
             setLoading(false)
