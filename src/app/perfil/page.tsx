@@ -31,17 +31,18 @@ export default function ProfilePage() {
             }
             setUser(session.user)
 
-            // Fetch Profile
+            // Fetch Profile (user_profiles)
             const { data: prof } = await supabase
                 .from('user_profiles')
                 .select('*')
+                .eq('id', session.user.id)
                 .single()
             setProfile(prof)
 
-            // Fetch Orders
+            // Fetch Orders (pedidos + productos)
             const { data: ords } = await supabase
                 .from('pedidos')
-                .select('*, productos(name, price)')
+                .select('*, productos(*)')
                 .eq('user_id', session.user.id)
                 .order('created_at', { ascending: false })
             setOrders(ords || [])
@@ -64,7 +65,7 @@ export default function ProfilePage() {
     )
 
     return (
-        <div style={{ minHeight: '100vh', padding: '60px 0 100px' }}>
+        <div style={{ minHeight: '100vh', padding: '60px 0 100px', background: '#0a0a0a' }}>
             <div className="container-padel">
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 48, alignItems: 'start' }}>
 
@@ -79,11 +80,11 @@ export default function ProfilePage() {
                     }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 32 }}>
                             <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontWeight: 800, fontSize: 20 }}>
-                                {user.email?.charAt(0).toUpperCase()}
+                                {user?.email?.charAt(0).toUpperCase()}
                             </div>
                             <div>
-                                <p style={{ fontWeight: 700, fontSize: 16, color: 'var(--text-primary)' }}>{user.user_metadata?.full_name || 'Usuario TRL'}</p>
-                                <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>{user.email}</p>
+                                <p style={{ fontWeight: 700, fontSize: 16, color: 'var(--text-primary)' }}>{profile?.full_name || user?.user_metadata?.full_name || 'Usuario TRL'}</p>
+                                <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>{user?.email}</p>
                             </div>
                         </div>
 
@@ -157,7 +158,7 @@ function OrderCard({ order }: { order: any }) {
                     <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 4 }}>ID Pedido: #{order.id.slice(0, 8)}</p>
                     <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Realizado el {new Date(order.created_at).toLocaleDateString()}</p>
                 </div>
-                <div style={{ padding: '4px 12px', background: 'rgba(74,222,128,0.1)', color: '#4ade80', borderRadius: 99, fontSize: 12, fontWeight: 700, border: '1px solid rgba(74,222,128,0.2)' }}>
+                <div style={{ padding: '4px 12px', background: order.estado_pago === 'pagado' ? 'rgba(74,222,128,0.1)' : 'rgba(251,191,36,0.1)', color: order.estado_pago === 'pagado' ? '#4ade80' : '#fbbf24', borderRadius: 99, fontSize: 12, fontWeight: 700, border: '1px solid currentColor' }}>
                     {order.estado_pago?.toUpperCase() || 'PAGADO'}
                 </div>
             </div>
@@ -168,11 +169,11 @@ function OrderCard({ order }: { order: any }) {
                 </div>
                 <div>
                     <h3 style={{ fontWeight: 700, fontSize: 15 }}>{order.productos?.name || 'Producto de TRL'}</h3>
-                    <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Cantidad: {order.cantidad || 1}</p>
+                    <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Talla: {order.talla_comprada} — Cantidad: {order.cantidad || 1}</p>
                 </div>
                 <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
                     <p style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 24, color: 'var(--accent)' }}>
-                        {new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format((order.productos?.price || 0) * (order.cantidad || 1))}
+                        {new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format((order.precio_unitario || order.productos?.price || 0) * (order.cantidad || 1))}
                     </p>
                 </div>
             </div>
@@ -185,7 +186,7 @@ function OrderCard({ order }: { order: any }) {
                         </button>
                     </a>
                 )}
-                <Link href={`/productos/${order.producto_id}`} style={{ textDecoration: 'none', flex: 1 }}>
+                <Link href={`/productos/${order.product_id}`} style={{ textDecoration: 'none', flex: 1 }}>
                     <button className="btn btn-ghost btn-sm" style={{ width: '100%', justifyContent: 'center' }}>
                         Ver Producto
                     </button>
@@ -198,15 +199,20 @@ function OrderCard({ order }: { order: any }) {
 function AddressManager({ profile, supabase, onUpdate }: { profile: any, supabase: any, onUpdate: (p: any) => void }) {
     const [formData, setFormData] = useState({
         address_line1: profile?.address_line1 || '',
+        address_line2: profile?.address_line2 || '',
         city: profile?.city || '',
         postal_code: profile?.postal_code || '',
+        country: profile?.country || 'España',
     })
 
     const handleSave = async () => {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session) return toast.error('Debes estar logueado')
+
         const { data, error } = await supabase
             .from('user_profiles')
             .update(formData)
-            .eq('id', profile.id)
+            .eq('id', session.user.id)
             .select()
             .single()
 
@@ -223,12 +229,22 @@ function AddressManager({ profile, supabase, onUpdate }: { profile: any, supabas
             <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, padding: 32 }}>
                 <div style={{ display: 'grid', gap: 20 }}>
                     <div>
-                        <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>DIRECCIÓN</label>
+                        <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>DIRECCIÓN LÍNEA 1</label>
                         <input
                             type="text"
                             value={formData.address_line1}
                             onChange={e => setFormData({ ...formData, address_line1: e.target.value })}
                             placeholder="Calle, número, piso..."
+                            style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 16px', color: '#fff', outline: 'none' }}
+                        />
+                    </div>
+                    <div>
+                        <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>DIRECCIÓN LÍNEA 2 (OPCIONAL)</label>
+                        <input
+                            type="text"
+                            value={formData.address_line2}
+                            onChange={e => setFormData({ ...formData, address_line2: e.target.value })}
+                            placeholder="Apartamento, suite, etc."
                             style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 16px', color: '#fff', outline: 'none' }}
                         />
                     </div>
@@ -252,6 +268,15 @@ function AddressManager({ profile, supabase, onUpdate }: { profile: any, supabas
                             />
                         </div>
                     </div>
+                    <div>
+                        <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>PAÍS</label>
+                        <input
+                            type="text"
+                            value={formData.country}
+                            onChange={e => setFormData({ ...formData, country: e.target.value })}
+                            style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 16px', color: '#fff', outline: 'none' }}
+                        />
+                    </div>
                     <button onClick={handleSave} className="btn btn-primary" style={{ marginTop: 12 }}>GUARDAR DIRECCIÓN</button>
                 </div>
             </div>
@@ -271,7 +296,7 @@ function AccountSettings({ user, profile }: { user: any, profile: any }) {
                     </div>
                     <div>
                         <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>EMAIL</p>
-                        <p style={{ fontSize: 16, fontWeight: 600 }}>{user.email}</p>
+                        <p style={{ fontSize: 16, fontWeight: 600 }}>{user?.email}</p>
                     </div>
                     <div>
                         <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>CONTRASEÑA</p>

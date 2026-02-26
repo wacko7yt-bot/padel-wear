@@ -4,15 +4,16 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import {
     Package, ShoppingCart, TrendingUp, LogOut,
-    Eye, EyeOff, AlertCircle, LayoutDashboard
+    Eye, EyeOff, AlertCircle, LayoutDashboard, Ticket
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { DashboardView } from '@/components/admin/DashboardView'
 import { ProductosView } from '@/components/admin/ProductosView'
 import { PedidosView } from '@/components/admin/PedidosView'
+import { CuponesView } from '@/components/admin/CuponesView'
 import toast from 'react-hot-toast'
 
-type AdminView = 'dashboard' | 'productos' | 'pedidos'
+type AdminView = 'dashboard' | 'productos' | 'pedidos' | 'cupones'
 
 export default function AdminPage() {
     const [view, setView] = useState<AdminView>('dashboard')
@@ -96,6 +97,7 @@ export default function AdminPage() {
         { id: 'dashboard', label: 'Dashboard', Icon: TrendingUp },
         { id: 'productos', label: 'Productos', Icon: Package },
         { id: 'pedidos', label: 'Pedidos', Icon: ShoppingCart },
+        { id: 'cupones', label: 'Cupones', Icon: Ticket },
     ]
 
     return (
@@ -132,6 +134,7 @@ export default function AdminPage() {
                 {view === 'dashboard' && <DashboardView />}
                 {view === 'productos' && <ProductosView />}
                 {view === 'pedidos' && <PedidosView />}
+                {view === 'cupones' && <CuponesView />}
             </main>
         </div>
     )

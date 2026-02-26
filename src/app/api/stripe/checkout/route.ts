@@ -30,10 +30,49 @@ export async function POST(request: Request) {
             quantity: item.quantity,
         }))
 
+        let stripeCustomerId: string | undefined = undefined
+
+        if (user) {
+            // Check if user has a saved stripe_customer_id in user_profiles
+            const { data: profile } = await supabase
+                .from('user_profiles')
+                .select('*')
+                .eq('id', user.id)
+                .single()
+
+            if (profile?.stripe_customer_id) {
+                stripeCustomerId = profile.stripe_customer_id
+            } else {
+                // Create a Stripe customer
+                const customer = await stripe.customers.create({
+                    email: user.email,
+                    name: profile?.full_name || user.user_metadata?.full_name,
+                    shipping: profile?.address_line1 ? {
+                        name: profile?.full_name || user.user_metadata?.full_name || user.email!,
+                        address: {
+                            line1: profile.address_line1,
+                            line2: profile.address_line2 || undefined,
+                            city: profile.city || undefined,
+                            postal_code: profile.postal_code || undefined,
+                            country: 'ES', // Default country for now
+                        }
+                    } : undefined
+                })
+                stripeCustomerId = customer.id
+
+                // Save to DB
+                await supabase
+                    .from('user_profiles')
+                    .update({ stripe_customer_id: customer.id })
+                    .eq('id', user.id)
+            }
+        }
+
         const session = await stripe.checkout.sessions.create({
             mode: 'payment',
             line_items: lineItems,
-            customer_email: user?.email,
+            customer: stripeCustomerId,
+            customer_email: stripeCustomerId ? undefined : user?.email,
             metadata: {
                 userId: user?.id ?? 'guest',
             },
@@ -42,6 +81,12 @@ export async function POST(request: Request) {
             },
             success_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/exito?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/cancelado`,
+            // Enable Link for one-click checkout
+            payment_method_options: {
+                card: {
+                    setup_future_usage: 'on_session',
+                }
+            }
         })
 
         return NextResponse.json({ url: session.url })
