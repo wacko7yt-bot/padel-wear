@@ -10,8 +10,9 @@ export async function GET() {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dummy'
     )
     const { data: { session } } = await supabaseClient.auth.getSession()
+    const admins = ['admin@theracketlab.es', 'racketlab@admin.es']
 
-    if (session?.user.email !== 'admin@theracketlab.es') {
+    if (!admins.includes(session?.user.email || '')) {
         return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
     }
 

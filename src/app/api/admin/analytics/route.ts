@@ -11,8 +11,9 @@ export async function GET() {
     )
 
     const { data: { session } } = await supabaseClient.auth.getSession()
+    const admins = ['admin@theracketlab.es', 'racketlab@admin.es']
 
-    if (session?.user.email !== 'admin@theracketlab.es') {
+    if (!admins.includes(session?.user.email || '')) {
         return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
     }
 

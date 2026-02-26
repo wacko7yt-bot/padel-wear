@@ -33,7 +33,8 @@ export default function AdminPage() {
                 return
             }
             const { data: { session } } = await supabase.auth.getSession()
-            if (session?.user.email === 'admin@theracketlab.es') {
+            const admins = ['admin@theracketlab.es', 'racketlab@admin.es']
+            if (admins.includes(session?.user.email || '')) {
                 setAuthed(true)
             } else {
                 setAuthed(false)

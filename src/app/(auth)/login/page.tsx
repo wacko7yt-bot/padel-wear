@@ -44,7 +44,8 @@ export default function LoginPage() {
                 toast.success('¡Bienvenido de nuevo!')
 
                 // Redirección inteligente
-                if (data.user?.email === 'admin@theracketlab.es') {
+                const admins = ['admin@theracketlab.es', 'racketlab@admin.es']
+                if (admins.includes(data.user?.email || '')) {
                     router.push('/admin')
                 } else {
                     router.push('/perfil')

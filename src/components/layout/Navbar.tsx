@@ -51,7 +51,8 @@ export function Navbar() {
                 setAccountMode(isAdmin ? 'admin' : 'guest')
                 setUserEmail(null)
             } else {
-                const isAdmin = session.user.email === 'admin@theracketlab.es' || sessionStorage.getItem('trl-admin') === 'ok'
+                const admins = ['admin@theracketlab.es', 'racketlab@admin.es']
+                const isAdmin = admins.includes(session.user.email) || sessionStorage.getItem('trl-admin') === 'ok'
                 setAccountMode(isAdmin ? 'admin' : 'client')
                 setUserEmail(session.user.email)
             }
