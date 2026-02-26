@@ -1,5 +1,4 @@
-# netlify.toml - Optimized for Next.js
-
+# netlify.toml - THE RACKET LAB
 [build]
   command = "npm run build"
   publish = ".next"
@@ -7,11 +6,18 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-[[redirects]]
-  from = "/*"
-  to = "/.next/server/pages/:splat"
-  status = 200
-  force = true
+[functions]
+  node_version = "20"
+  included_files = ["public/**"]
 
-[build.environment]
-  NEXT_USE_NETLIFY_EDGE = "true"
+[dev]
+  command = "npm run dev"
+  port = 3000
+  targetPort = 3000
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
