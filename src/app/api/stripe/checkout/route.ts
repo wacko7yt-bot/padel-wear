@@ -1,12 +1,13 @@
 export const dynamic = 'force-dynamic'
 
 import { NextResponse } from 'next/server'
-import { stripe } from '@/lib/stripe/server'
+import { getStripe } from '@/lib/stripe/server'
 import { createClient } from '@/lib/supabase/server'
 import type { CartItem } from '@/types'
 
 export async function POST(request: Request) {
     try {
+        const stripe = getStripe()
         const supabase = await createClient()
         const { data: { user } } = await supabase.auth.getUser()
 

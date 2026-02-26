@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import { NextResponse } from 'next/server'
 import { headers } from 'next/headers'
-import { stripe } from '@/lib/stripe/server'
+import { getStripe } from '@/lib/stripe/server'
 import { createClient } from '@/lib/supabase/server'
 import Stripe from 'stripe'
 
@@ -11,6 +11,7 @@ export async function POST(request: Request) {
     const headersList = await headers()
     const signature = headersList.get('stripe-signature')!
 
+    const stripe = getStripe()
     let event: Stripe.Event
 
     try {
