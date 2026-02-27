@@ -132,16 +132,20 @@ export function ProductosView() {
                 <div style={{ background: '#161616', border: '1px solid var(--accent)', borderRadius: 16, padding: 24, marginBottom: 32 }} className="animate-scale-in">
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
                         <InputField label="Nombre" value={form.name!} onChange={v => setForm(f => ({ ...f, name: v }))} />
-                        <InputField label="Precio" type="number" value={String(form.price)} onChange={v => setForm(f => ({ ...f, price: Number(v) }))} />
+                        <InputField label="Precio (€)" type="number" value={String(form.price)} onChange={v => setForm(f => ({ ...f, price: Number(v) }))} />
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12, gridColumn: 'span 2' }}>
-                            <InputField label="Stock S" type="number" value={String(form.size_s)} onChange={v => setForm(f => ({ ...f, size_s: Number(v) }))} />
-                            <InputField label="Stock M" type="number" value={String(form.size_m)} onChange={v => setForm(f => ({ ...f, size_m: Number(v) }))} />
-                            <InputField label="Stock L" type="number" value={String(form.size_l)} onChange={v => setForm(f => ({ ...f, size_l: Number(v) }))} />
-                            <InputField label="Stock XL" type="number" value={String(form.size_xl)} onChange={v => setForm(f => ({ ...f, size_xl: Number(v) }))} />
+                        {/* Sección de Stock mejorada */}
+                        <div style={{ gridColumn: '1 / -1', background: 'rgba(255,255,255,0.02)', padding: 20, borderRadius: 12, border: '1px solid rgba(255,255,255,0.05)' }}>
+                            <p style={{ fontSize: 11, fontWeight: 800, color: 'var(--accent)', letterSpacing: '0.05em', marginBottom: 16, textTransform: 'uppercase' }}>Inventario por Talla</p>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: 12 }}>
+                                <StockInput label="Talla S" value={form.size_s} onChange={v => setForm(f => ({ ...f, size_s: v }))} />
+                                <StockInput label="Talla M" value={form.size_m} onChange={v => setForm(f => ({ ...f, size_m: v }))} />
+                                <StockInput label="Talla L" value={form.size_l} onChange={v => setForm(f => ({ ...f, size_l: v }))} />
+                                <StockInput label="Talla XL" value={form.size_xl} onChange={v => setForm(f => ({ ...f, size_xl: v }))} />
+                            </div>
                         </div>
 
-                        <div style={{ gridColumn: 'span 2' }}>
+                        <div style={{ gridColumn: '1 / -1' }}>
                             <ImageUpload
                                 value={form.images || []}
                                 onChange={v => setForm(f => ({ ...f, images: v }))}
@@ -207,6 +211,20 @@ function InputField({ label, value, onChange, type = 'text' }: { label: string, 
             <input
                 type={type} value={value} onChange={e => onChange(e.target.value)}
                 style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '10px 12px', color: '#fff', fontSize: 14, outline: 'none' }}
+            />
+        </div>
+    )
+}
+
+function StockInput({ label, value, onChange }: { label: string, value: number | null | undefined, onChange: (v: number) => void }) {
+    return (
+        <div style={{ background: '#000', padding: '12px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.05)' }}>
+            <label style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.3)', display: 'block', marginBottom: 6 }}>{label}</label>
+            <input
+                type="number"
+                value={value ?? 0}
+                onChange={e => onChange(Number(e.target.value))}
+                style={{ width: '100%', background: 'none', border: 'none', color: '#fff', fontSize: 18, fontWeight: 700, outline: 'none' }}
             />
         </div>
     )
