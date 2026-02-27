@@ -133,6 +133,14 @@ export function ProductosView() {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
                         <InputField label="Nombre" value={form.name!} onChange={v => setForm(f => ({ ...f, name: v }))} />
                         <InputField label="Precio" type="number" value={String(form.price)} onChange={v => setForm(f => ({ ...f, price: Number(v) }))} />
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12, gridColumn: 'span 2' }}>
+                            <InputField label="Stock S" type="number" value={String(form.size_s)} onChange={v => setForm(f => ({ ...f, size_s: Number(v) }))} />
+                            <InputField label="Stock M" type="number" value={String(form.size_m)} onChange={v => setForm(f => ({ ...f, size_m: Number(v) }))} />
+                            <InputField label="Stock L" type="number" value={String(form.size_l)} onChange={v => setForm(f => ({ ...f, size_l: Number(v) }))} />
+                            <InputField label="Stock XL" type="number" value={String(form.size_xl)} onChange={v => setForm(f => ({ ...f, size_xl: Number(v) }))} />
+                        </div>
+
                         <div style={{ gridColumn: 'span 2' }}>
                             <ImageUpload
                                 value={form.images || []}
