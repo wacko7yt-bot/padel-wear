@@ -53,8 +53,15 @@ export function DashboardView() {
                 ])
                 const pData = await pRes.json()
                 const aData = await aRes.json()
+
                 setProductos(Array.isArray(pData) ? pData : [])
-                setAnalytics(aData)
+
+                // Si la API devuelve un error (ej. {error: '...'}), no lo guardamos como analytics
+                if (aData && !aData.error && aData.summary) {
+                    setAnalytics(aData)
+                } else {
+                    console.error('Error en analíticas:', aData?.error || 'Datos inválidos')
+                }
             } catch (err) {
                 console.error(err)
             } finally {
@@ -172,7 +179,7 @@ export function DashboardView() {
                                     contentStyle={{ background: '#1c1c1c', border: 'none', borderRadius: 12 }}
                                 />
                                 <Bar dataKey="units" radius={[0, 4, 4, 0]}>
-                                    {(analytics?.chartData || []).map((_, index: number) => (
+                                    {(analytics?.topProducts || []).map((_, index: number) => (
                                         <Cell key={`cell-${index}`} fill={index === 0 ? 'var(--accent)' : 'rgba(255,255,255,0.1)'} />
                                     ))}
                                 </Bar>
